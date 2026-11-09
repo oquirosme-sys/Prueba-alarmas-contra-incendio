@@ -85,3 +85,10 @@ La herramienta usa Supabase y su propio acceso con PIN (`js/auth.js`, `js/config
 - Las columnas de dispositivos son los TAG del catálogo presentes en el proyecto, no las abreviaturas del libro (DH, DT, MM…), porque el catálogo trae varios fabricantes.
 - Verificado en el navegador, con datos simulados: las corrientes y la caída de la tabla coinciden con `Calc.caida` (SLC 17 mA, NAC 428 mA) y las cantidades por lazo y por nivel coinciden con las filas cargadas.
 - **No se hizo:** la pérdida de voceo en dB (el catálogo no trae la potencia de los parlantes), la columna de amplificador de la tabla 5, el Excel y el PDF en este formato, ni la comparación contra el proyecto completo del libro. Las decisiones de la sección 4 siguen abiertas: el cálculo es el de la herramienta.
+
+## 9. Excel en formato libro (2026-11-09)
+
+- Botón **Descargar Excel** en la pestaña «Formato libro» (`js/excel-libro.js`, ExcelJS 4.4.0 desde cdnjs, se carga al exportar). Genera tres hojas con los nombres del libro: «3. Conteo dispositivos», «4. SLC + AUX» y «5. NAC + VOCEO», con los mismos datos que la pantalla.
+- R total, caída, tensión disponible, estado y los totales del conteo son fórmulas con su resultado guardado. La tensión de la fuente y la mínima están en las celdas C2 y H2 de las hojas 4 y 5.
+- Verificado: el libro se genera, se vuelve a leer con ExcelJS y se comprueban hojas, orientación (carta; apaisada en 4 y 5), fórmulas y resultados contra el cálculo de la herramienta. El botón dispara la descarga sin errores en la consola.
+- **No verificado:** el aspecto abierto en Excel real y la impresión. Faltan el PDF en este formato y la pérdida de voceo en dB.

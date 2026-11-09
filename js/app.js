@@ -1214,7 +1214,7 @@
     function cant(x) { return '<td class="num">' + (x ? fmt(x, 0) : '0') + '</td>'; }
     function encTags(tags) { return tags.map(function (t) { return '<th class="num">' + esc(t) + '</th>'; }).join(''); }
     h.push('<div class="encabezado"><div><h2>Formato libro</h2><div class="sub">Las tablas del libro «Notifier - Memoría de Alarma» (3. Conteo, 4. SLC + AUX y 5. NAC + VOCEO) con los datos del proyecto. Solo lectura: los datos se editan en cada panel y en «Caída de tensión».</div></div>' +
-      '<div class="acciones"><button class="btn" data-act="ir" data-tab="caida">← Caída de tensión</button></div></div>');
+      '<div class="acciones"><button class="btn" data-act="ir" data-tab="caida">← Caída de tensión</button><button class="btn primary" data-act="excel-libro">Descargar Excel</button></div></div>');
     h.push('<div class="ayuda"><b>Diferencias con el libro.</b> La resistencia del lazo es de ida y vuelta (2 × L), el libro usa un solo sentido; la tensión disponible debe ser mayor o igual que la mínima, y se revisa el tope de corriente del NAC. ' +
       'El libro no calcula la pérdida de voceo en dB porque el catálogo aún no trae la potencia de los parlantes.</div>');
 
@@ -2178,6 +2178,16 @@
         proyectoCambiado(); renderVista();
         toast('Lazo ' + c.circuito + ' creado y asignado');
       });
+    },
+    'excel-libro': function () {
+      var P = S.proy;
+      ExcelLibro.generar(FormatoLibro.datos(S.cx, P), P.nombre).then(function (buf) {
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));
+        a.download = ('Memoria de alarma ' + (P.numero ? P.numero + ' ' : '') + (P.nombre || '') + '.xlsx').replace(/[\\/:*?"<>|]+/g, '_');
+        document.body.appendChild(a); a.click();
+        setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+      }).catch(function (e) { toast('No se pudo generar el Excel: ' + msgError(e)); });
     },
     'circ-add': function (b) {
       var cs = S.proy.caida.circuitos, ult = cs[cs.length - 1];
