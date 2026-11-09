@@ -110,3 +110,52 @@ Se resolvieron los puntos 1 y 2 de la sección 4. **No cambia ningún código**:
 2. **Aceptación: tensión disponible de 16 V o más, y corriente del NAC no mayor de 2,4 A.** El libro exige más de 16 V y no revisa la corriente del NAC.
 
 Siguen abiertos los puntos 3 a 5 de la sección 4 (corriente del SLC, consumo del módulo de lazo y modelos del catálogo).
+
+## 12. Revisión del catálogo contra la pestaña «1. Dispositivos» (2026-11-09)
+
+Se compararon los valores del libro con `js/catalogo-base.js` (versión 9, fabricante NOTIFIER). Corrientes en mA. **No se cambió el catálogo**: no hay forma de saber desde aquí cuál valor es el de la ficha vigente.
+
+### Detección (pestaña 1, tabla 1)
+
+| Libro | Modelo del libro | Espera / alarma (libro) | Equivalente en el catálogo | Espera / alarma (catálogo) | Resultado |
+|---|---|---|---|---|---|
+| DH | FSP-1 | 0,2 / 4,5 | FSP-951 (SDH) · FSP-851 (SDH) | 0,3 / 6,5 · 0,3 / 6,8 | **Difiere** |
+| DT | FST-1 | 0,2 / 4,5 | FST-951 (SDT) · FST-851 (SDT) | 0,3 / 6,5 · 0,3 / 6,8 | **Difiere** |
+| DH + SB | FSP-1 + B200S-LF | SLC 0,5 / 304,5; aux. 55 / 140 | SB (B200S) 0,5 / 35, en circuito «FUENTE AUX» | 0,5 / 35 | **Difiere** (alarma y aux.) |
+| DT + SB | FST-1 + B200S-LF | igual que DH + SB | no existe la combinación; se arma con FST-951 + SB | — | Falta combinación |
+| F | NBG-12X | 0,375 / 5 | NBG-12LX (EM) | 0,23 / 5 | **Difiere** (espera) |
+| MM | FMM-1 | 0,375 / 5 | FMM-1 (AIM) | 0,375 / 5 | Coincide |
+| MR - MC | FRM-1 | 0,23 / 6,5 | FRM-1 (RLY) | 0,23 / 6,5 | Coincide |
+| CO | sin modelo en el libro | — | INTELLIQUAD PLUS (CO) | 0,3 / 7,2 | Sin referencia |
+
+El libro no tiene tensión mínima por dispositivo en la herramienta: usa 16 V para detectores y bases y 15 V para estación manual, monitoreo y control. La herramienta aplica una sola tensión mínima por proyecto.
+
+### Notificación (pestaña 1, tabla 2)
+
+El libro trae siete altavoces con estrobo y siete estrobos del modelo BA-FIRE-AVDS-62174, con corrientes de 18, 22, 70, 75, 85, 105 y 125 mA (15, 30, 75, 95, 110, 135 y 185 cd). El catálogo no tiene ese modelo ni ese fabricante. Los equivalentes NOTIFIER del catálogo tienen **otras corrientes**: SR de 15 a 110 cd con 64, 80, 127 y 167 mA. No son comparables sin saber qué producto usa el proyecto. Además, las corrientes de voceo del libro (0,0833 A por altavoz de 2 W, calculadas a 24 V) no tienen equivalente: el catálogo no registra la potencia de los parlantes.
+
+### Equipos de campo del libro
+
+| Libro | Dato | Catálogo |
+|---|---|---|
+| SLM-318 (módulo de lazo, uno por lazo SLC) | 159 mA espera, 210 mA alarma | No existe |
+| DAA2-5070 (amplificador) | 400 mA espera, 550 mA alarma | Coincide (DAA2-5070: 400 / 550) |
+| HPF-PS10 y HPF-PS6 (fuentes remotas) | 10 A y 6 A | No existen; el catálogo trae FCPS-24S8 (8 A) |
+
+### Cables (pestaña 1, tabla 3)
+
+| AWG | Libro (modelo, Ω/km) | Catálogo (modelo, Ω/km) | Comentario |
+|---|---|---|---|
+| 18 | 5320FL, 21 | 5320UL, 21 | Coincide el valor; falta el modelo FL |
+| 16 | 5220FL, 12,8 | 5220FL, 13,5 | El catálogo es mayor (conservador) |
+| 14 | 5120FL, 8 | 5120UL, 8,4 | El catálogo es mayor (conservador); falta el modelo FL |
+| 12 | 5020FL, 5,7 | 5020UL, 5,2 | **El catálogo es menor**: con el valor del catálogo la caída sale unos 9 % más baja; falta el modelo FL |
+
+La capacidad en pF/m del libro no se usa en ningún cálculo y el catálogo no la guarda.
+
+### Qué hay que decidir
+
+1. **Detección:** qué valores rigen para FSP, FST y NBG (libro o catálogo). Conviene confirmarlo contra la ficha vigente del fabricante antes de cambiar nada.
+2. **Bases sonoras:** el libro pone 304,5 mA en el lazo SLC y 55 / 140 mA en el auxiliar para la base B200S-LF; el catálogo, 35 mA en la alimentación auxiliar. Es la diferencia de mayor efecto en la caída de los lazos SLC.
+3. **Notificación:** si el proyecto usa el modelo BA-FIRE-AVDS-62174, hay que agregarlo al catálogo con su fabricante y sus corrientes.
+4. **Módulo de lazo, fuentes remotas y cables FL:** agregar SLM-318, HPF-PS10, HPF-PS6 y los cables 5320FL, 5120FL y 5020FL si el proyecto los usa.
