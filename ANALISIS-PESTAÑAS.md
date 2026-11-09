@@ -99,3 +99,14 @@ La herramienta usa Supabase y su propio acceso con PIN (`js/auth.js`, `js/config
 - El **Anexo B** va en hojas carta apaisadas, con el mismo membrete y pie que la memoria (página con nombre `memoria-apaisada` en `css/styles.css`). Trae tres tablas numeradas a continuación de las anteriores: conteo de dispositivos por nivel, lazos SLC y auxiliar +24 VDC, y lazos NAC y voceo. Las cifras son las de la pestaña «Formato libro» y las del Excel. La nota final de la memoria cierra en la última hoja apaisada.
 - Verificado con un proyecto de prueba (2 paneles, 4 niveles, 6 lazos): PDF generado con Chrome sin ventana y revisado con pdf.js. Resultado: 7 páginas, 5 verticales y 2 apaisadas; tablas numeradas del 1 al 10; texto de 8 pt como mínimo; nada fuera del margen; ningún encabezado partido tras ajustar el ancho de las columnas.
 - **No verificado:** el diálogo de impresión del navegador y el aspecto en pantalla completa; la lectura visual de las páginas fue a baja resolución. Con muchos TAG distintos en un lazo las columnas se estrechan (el ancho útil apaisado es 23,9 cm).
+
+## 11. Decisiones de cálculo (2026-11-09)
+
+Se resolvieron los puntos 1 y 2 de la sección 4. **No cambia ningún código**: ambos criterios son los que la herramienta ya aplica.
+
+1. **Resistencia del lazo: ida y vuelta (`R = 2 × L × ohm/km / 1000`).** La «Distancia» se entiende como la del dispositivo más lejano del lazo, no como el recorrido total del cable. El libro usa un solo sentido, así que con los mismos datos da la mitad de la caída.
+   - Efecto con los 1000 m del libro: los lazos SLC pasan de 16,8 V disponibles (libro, cumplen) a entre 12,6 V y 14,5 V (ida y vuelta, no cumplen). Con 16 AWG y la corriente de alarma de SLC-1, el límite es de unos 600 m.
+   - Consecuencia para la comparación con el libro: los estados «Cumple» del libro no se pueden reproducir con las mismas distancias. Para comparar, hay que usar la mitad de la distancia en la herramienta, o confirmar si los 1000 m del libro eran un valor provisional.
+2. **Aceptación: tensión disponible de 16 V o más, y corriente del NAC no mayor de 2,4 A.** El libro exige más de 16 V y no revisa la corriente del NAC.
+
+Siguen abiertos los puntos 3 a 5 de la sección 4 (corriente del SLC, consumo del módulo de lazo y modelos del catálogo).
