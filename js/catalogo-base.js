@@ -3,8 +3,8 @@
  * Corrientes en mA a 24 VDC · resistencia de cable en Ω/km por conductor · baterías 12 V SLA (2 en serie = 24 V).
  * En la fase 2 estas listas pasan a tablas de Supabase. */
 window.CATALOGO_BASE = {
-  version: 9,
-  actualizado: "2026-10-07",
+  version: 10,
+  actualizado: "2026-11-09",
   fabricantes: [
     {"id": "simplex", "nombre": "SIMPLEX"},
     {"id": "notifier", "nombre": "NOTIFIER"},
@@ -167,6 +167,10 @@ window.CATALOGO_BASE = {
     {"id": "d154", "fabricante": "simplex", "modelo": "4906-9102", "tag": "ST-C 30cd", "tipo": "Estrobo de cielo", "descripcion": "ESTROBO DE CIELO TrueAlert multi-candela 30 cd (rojo, FIRE) 4906-9102", "iEspera": null, "iAlarma": null, "circuito": "NAC", "obs": "Foundation Series (catálogo Simplex v7): estrobo no direccionable; corriente por candela sin dato en el catálogo: digitarla de la ficha del P/N."},
     {"id": "d155", "fabricante": "simplex", "modelo": "4906-9102", "tag": "ST-C 75cd", "tipo": "Estrobo de cielo", "descripcion": "ESTROBO DE CIELO TrueAlert multi-candela 75 cd (rojo, FIRE) 4906-9102", "iEspera": null, "iAlarma": null, "circuito": "NAC", "obs": "Foundation Series (catálogo Simplex v7): estrobo no direccionable; corriente por candela sin dato en el catálogo: digitarla de la ficha del P/N."},
     {"id": "d156", "fabricante": "simplex", "modelo": "4906-9102", "tag": "ST-C 110cd", "tipo": "Estrobo de cielo", "descripcion": "ESTROBO DE CIELO TrueAlert multi-candela 110 cd (rojo, FIRE) 4906-9102", "iEspera": null, "iAlarma": null, "circuito": "NAC", "obs": "Foundation Series (catálogo Simplex v7): estrobo no direccionable; corriente por candela sin dato en el catálogo: digitarla de la ficha del P/N."},
+    {"id": "d201", "fabricante": "notifier", "modelo": "FSP-1", "tag": "SDH", "tipo": "Detector de humo", "descripcion": "DETECTOR DE HUMO FSP-1 (valores del libro Notifier)", "iEspera": 0.2, "iAlarma": 4.5, "circuito": "SLC", "obs": "Valores del libro «Notifier - Memoría de Alarma», pestaña 1 (200 µA espera, 4.5 mA alarma). Difieren de FSP-951 y FSP-851 (0.3 / 6.5 y 0.3 / 6.8): confirmar contra la ficha del modelo especificado."},
+    {"id": "d202", "fabricante": "notifier", "modelo": "FST-1", "tag": "SDT", "tipo": "Detector de temperatura", "descripcion": "DETECTOR DE TEMPERATURA FST-1 (valores del libro Notifier)", "iEspera": 0.2, "iAlarma": 4.5, "circuito": "SLC", "obs": "Valores del libro «Notifier - Memoría de Alarma», pestaña 1 (200 µA espera, 4.5 mA alarma). Difieren de FST-951 y FST-851 (0.3 / 6.5 y 0.3 / 6.8): confirmar contra la ficha del modelo especificado."},
+    {"id": "d203", "fabricante": "notifier", "modelo": "NBG-12X", "tag": "EM", "tipo": "Estación manual", "descripcion": "ESTACIÓN MANUAL DIRECCIONABLE NBG-12X (valores del libro Notifier)", "iEspera": 0.375, "iAlarma": 5, "circuito": "SLC", "obs": "Valores del libro «Notifier - Memoría de Alarma», pestaña 1 (375 µA espera, 5 mA alarma). NBG-12LX del catálogo: 0.23 / 5."},
+    {"id": "d204", "fabricante": "notifier", "modelo": "B200S-LF (libro)", "tag": "SB", "tipo": "Base audible (SB)", "descripcion": "BASE AUDIBLE B200S-LF (valores del libro Notifier; solo la base, agregue el detector)", "iEspera": 55, "iAlarma": 140, "circuito": "FUENTE AUX", "circuito2": "24VDC", "obs": "Valores del libro «Notifier - Memoría de Alarma», pestaña 1: auxiliar +24 VDC 55 mA en espera y 140 mA en alarma. El libro suma además al lazo SLC 0.3 mA en espera y 300 mA en alarma; esa parte NO está modelada (parece un error de unidades: 300/1000 en vez de 300/1000000) y falta confirmarla. B200S del catálogo: 0.5 / 35."},
     {"id": "d63", "fabricante": "generico", "modelo": "—", "tag": "OTRO", "tipo": "Otro dispositivo", "descripcion": "OTRO DISPOSITIVO (digitar corrientes manualmente)", "iEspera": 0, "iAlarma": 0, "circuito": "—", "obs": "Editar corrientes en esta fila"}
   ],
   cables: [

@@ -159,3 +159,19 @@ La capacidad en pF/m del libro no se usa en ningún cálculo y el catálogo no l
 2. **Bases sonoras:** el libro pone 304,5 mA en el lazo SLC y 55 / 140 mA en el auxiliar para la base B200S-LF; el catálogo, 35 mA en la alimentación auxiliar. Es la diferencia de mayor efecto en la caída de los lazos SLC.
 3. **Notificación:** si el proyecto usa el modelo BA-FIRE-AVDS-62174, hay que agregarlo al catálogo con su fabricante y sus corrientes.
 4. **Módulo de lazo, fuentes remotas y cables FL:** agregar SLM-318, HPF-PS10, HPF-PS6 y los cables 5320FL, 5120FL y 5020FL si el proyecto los usa.
+
+## 13. Catálogo: valores del libro para detectores y base sonora (2026-11-09)
+
+Decisión del usuario: rigen los valores del libro. Catálogo base **versión 10** (`js/catalogo-base.js`). Los modelos existentes no se tocaron; se agregaron cuatro, para que los proyectos ya guardados con FSP-951, FSP-851 y B200S den el mismo resultado de antes.
+
+| Id | Modelo | TAG | Espera / alarma (mA) | Circuito |
+|---|---|---|---|---|
+| d201 | FSP-1 | SDH | 0,2 / 4,5 | SLC |
+| d202 | FST-1 | SDT | 0,2 / 4,5 | SLC |
+| d203 | NBG-12X | EM | 0,375 / 5 | SLC |
+| d204 | B200S-LF (libro) | SB | 55 / 140 | Fuente auxiliar (24 VDC) |
+
+- **Pendiente en la base sonora.** El libro suma además al lazo SLC 0,3 mA en espera y **300 mA en alarma** por base. Esa parte **no se copió**: la herramienta carga todo el consumo de un dispositivo en un solo lazo, y el valor parece un error de unidades en el libro (la espera usa `300/1000000` y la alarma `300/1000`). Con 30 bases en un lazo serían 9 A. Hay que confirmar la corriente real de la base en el lazo SLC; mientras tanto el lazo solo cuenta la base como dispositivo.
+- La combinación «DT + base sonora» sigue armándose con dos filas (FST-1 y B200S-LF).
+- **Verificado:** el catálogo carga sin errores y sin ids repetidos (160 dispositivos). Con diez FSP-1, dos FST-1, una NBG-12X y tres bases en un lazo, la corriente del SLC es 59 mA y la del auxiliar 420 mA, como dan las cantidades por las corrientes del catálogo; la espera es 2,775 mA y 165 mA.
+- Sin cambio: los cables (5320FL, 5120FL, 5020FL), el modelo BA-FIRE-AVDS-62174, el SLM-318 y las fuentes HPF-PS10 y HPF-PS6 siguen sin estar en el catálogo.
