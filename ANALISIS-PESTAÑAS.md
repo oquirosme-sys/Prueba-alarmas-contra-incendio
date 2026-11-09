@@ -175,3 +175,5 @@ Decisión del usuario: rigen los valores del libro. Catálogo base **versión 10
 - La combinación «DT + base sonora» sigue armándose con dos filas (FST-1 y B200S-LF).
 - **Verificado:** el catálogo carga sin errores y sin ids repetidos (160 dispositivos). Con diez FSP-1, dos FST-1, una NBG-12X y tres bases en un lazo, la corriente del SLC es 59 mA y la del auxiliar 420 mA, como dan las cantidades por las corrientes del catálogo; la espera es 2,775 mA y 165 mA.
 - Sin cambio: los cables (5320FL, 5120FL, 5020FL), el modelo BA-FIRE-AVDS-62174, el SLM-318 y las fuentes HPF-PS10 y HPF-PS6 siguen sin estar en el catálogo.
+
+**Decisión (2026-11-09):** la corriente de la base B200S-LF en el lazo SLC se deja **sin modelar**. El lazo SLC cuenta la base como dispositivo y no suma su consumo. Se retoma cuando se confirme la corriente con la ficha del fabricante.
