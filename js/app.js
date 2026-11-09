@@ -1289,13 +1289,15 @@
     var R = Calc.proyecto(S.cx, P);
     var vF = R.caida.params.vFuente;
     var detalle = S.memDetalle !== false;
+    var libro = S.memLibro !== false;
     var ctx = { n: 0 };
     var h = [];
     var equipos = R.paneles.map(function (x) { return x.p.tag; }).concat(R.fuentes.map(function (x) { return x.f.tag; }));
 
     h.push('<div class="card no-print" style="display:flex; gap:12px; align-items:center; flex-wrap:wrap">' +
       '<button class="btn primary" data-act="imprimir">Imprimir / Guardar PDF</button>' +
-      '<label style="display:flex; align-items:center; gap:6px; font-size:13px"><input type="checkbox" id="chkDetalle"' + (detalle ? ' checked' : '') + '> Incluir detalle de cargas por equipo (anexo)</label>' +
+      '<label style="display:flex; align-items:center; gap:6px; font-size:13px"><input type="checkbox" id="chkDetalle"' + (detalle ? ' checked' : '') + '> Incluir detalle de cargas por equipo (anexo A)</label>' +
+      '<label style="display:flex; align-items:center; gap:6px; font-size:13px"><input type="checkbox" id="chkLibro"' + (libro ? ' checked' : '') + '> Incluir tablas en formato del libro (anexo B, apaisado)</label>' +
       '<span class="muted" style="font-size:12px">Formato Sinergia: hoja carta, márgenes 3,0 / 2,5 cm. Verifique la impresión en el PDF.</span></div>');
 
     h.push('<article class="doc">');
@@ -1438,8 +1440,35 @@
       h.push('<p class="note">* Corriente unitaria digitada manualmente (reemplaza el valor de catálogo).</p>');
     }
 
-    h.push('<p class="note">Memoria de cálculo de ingeniería. Los valores de corriente de dispositivos y resistencia de cables provienen de fichas técnicas y deben verificarse contra la revisión vigente antes de construcción. ' +
+    // ---- Anexo B · tablas en formato del libro, en hoja apaisada (las tres comparten sección)
+    if (libro) {
+      var L = FormatoLibro.datos(S.cx, P);
+      var cnt = function (x) { return String(x || 0); };
+      var estL = function (f) { return f.estado ? estCaida(f.estado) : '—'; };
+      var fdoc = function (x, d) { return fmt(x, d); };
+      var tagCols = function (tags) { return tags.map(function (t) { var lp = Math.max.apply(null, String(t).split(' ').map(function (s) { return s.length; })); return { t: t, w: Math.max(1.5, 0.25 * lp + 0.25), num: true }; }); };
+      h.push('<section class="anexo-apaisado"><h2>Anexo B. Tablas en formato del libro de cálculo</h2>' +
+        '<p>Se presentan el conteo de dispositivos por nivel y los lazos de detección y de notificación con el formato del libro de cálculo de referencia. Las cifras son las de las tablas anteriores. ' +
+        'La resistencia del lazo se calcula con la longitud de ida y vuelta, y la tensión disponible debe ser mayor o igual que la tensión mínima del dispositivo.</p>');
+      var C = L.conteo, tot = function (f) { return C.tags.reduce(function (s, t) { return s + (f[t] || 0); }, 0); };
+      h.push(tablaDoc(ctx, 'Conteo de dispositivos por nivel', [{ t: 'nivel', w: 3 }].concat(tagCols(C.tags), [{ t: 'total', w: 1.2, num: true }]),
+        C.niveles.map(function (n) { var f = C.porNivel[n] || {}; return [dato(n)].concat(C.tags.map(function (t) { return cnt(f[t]); }), [String(tot(f))]); }), 'Sin dispositivos con nivel asignado.'));
+      h.push(tablaDoc(ctx, 'Lazos SLC y auxiliar +24 VDC', [{ t: 'panel', w: 1.6 }, { t: 'lazo', w: 1.5 }, { t: 'nivel / es', w: 2 }].concat(tagCols(L.slc.tags), [{ t: 'SLC espera (A)', w: 1.5, num: true }, { t: 'SLC alarma (A)', w: 1.5, num: true },
+        { t: 'aux. espera (A)', w: 1.5, num: true }, { t: 'aux. alarma (A)', w: 1.5, num: true }, { t: 'dist. (m)', w: 1.2, num: true }, { t: 'AWG', w: 1.3, num: true }, { t: 'R (Ω/km)', w: 1.2, num: true },
+        { t: 'R total (Ω)', w: 1.3, num: true }, { t: 'caída (V)', w: 1.2, num: true }, { t: 'V disp. (V)', w: 1.3, num: true }, { t: 'estado', w: 1.8 }]),
+      L.slc.filas.map(function (f) {
+        return [dato(f.equipo), dato(f.lazo), dato(f.niveles)].concat(L.slc.tags.map(function (t) { return cnt(f.tags[t]); }), [fdoc(f.esp, 4), fdoc(f.alm, 4), fdoc(f.auxEsp, 4), fdoc(f.auxAlm, 4), fdoc(f.dist, 0), fdoc(f.awg, 0), fdoc(f.rKm, 2), fdoc(f.rLazo, 3), fdoc(f.caida, 2), fdoc(f.vDisp, 2), estL(f)]);
+      }), 'Sin lazos SLC, SLC+24V o 24 VDC.'));
+      h.push(tablaDoc(ctx, 'Lazos NAC y voceo', [{ t: 'fuente / panel', w: 1.8 }, { t: 'lazo', w: 1.5 }, { t: 'tipo', w: 1.3 }, { t: 'nivel / es', w: 2 }].concat(tagCols(L.nac.tags), [{ t: 'I alarma (A)', w: 1.5, num: true },
+        { t: 'dist. (m)', w: 1.2, num: true }, { t: 'AWG', w: 1.3, num: true }, { t: 'R (Ω/km)', w: 1.2, num: true }, { t: 'R total (Ω)', w: 1.3, num: true }, { t: 'caída (V)', w: 1.2, num: true }, { t: 'V disp. (V)', w: 1.3, num: true }, { t: 'estado', w: 1.8 }]),
+      L.nac.filas.map(function (f) {
+        return [dato(f.equipo), dato(f.lazo), dato(etiquetaTipo(f.tipo)), dato(f.niveles)].concat(L.nac.tags.map(function (t) { return cnt(f.tags[t]); }), [fdoc(f.iA, 4), fdoc(f.dist, 0), fdoc(f.awg, 0), fdoc(f.rKm, 2), fdoc(f.rLazo, 3), fdoc(f.caida, 2), fdoc(f.vDisp, 2), estL(f)]);
+      }), 'Sin lazos NAC, IDNAC o voceo.'));
+    }
+
+    var notaFinal = ('<p class="note">Memoria de cálculo de ingeniería. Los valores de corriente de dispositivos y resistencia de cables provienen de fichas técnicas y deben verificarse contra la revisión vigente antes de construcción. ' +
       'Aprobación final: AHJ (Ingeniería de Bomberos de Costa Rica). Catálogo actualizado: ' + esc(S.cat.actualizado || '') + '.</p>');
+    h.push(libro ? notaFinal + '</section>' : notaFinal);   // con el anexo B la nota cierra en la hoja apaisada
     h.push('</article>');
     vista.innerHTML = h.join('');
   }
@@ -1864,6 +1893,7 @@
   vista.addEventListener('change', function (e) {
     var el = e.target;
     if (el.id === 'chkDetalle') { S.memDetalle = el.checked; renderVista(); return; }
+    if (el.id === 'chkLibro') { S.memLibro = el.checked; renderVista(); return; }
     if (el.dataset && el.dataset.usuario) {
       var cambio = {};
       cambio[el.dataset.campo] = el.type === 'checkbox' ? el.checked : el.value;

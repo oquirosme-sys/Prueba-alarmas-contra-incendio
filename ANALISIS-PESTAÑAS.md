@@ -92,3 +92,10 @@ La herramienta usa Supabase y su propio acceso con PIN (`js/auth.js`, `js/config
 - R total, caída, tensión disponible, estado y los totales del conteo son fórmulas con su resultado guardado. La tensión de la fuente y la mínima están en las celdas C2 y H2 de las hojas 4 y 5.
 - Verificado: el libro se genera, se vuelve a leer con ExcelJS y se comprueban hojas, orientación (carta; apaisada en 4 y 5), fórmulas y resultados contra el cálculo de la herramienta. El botón dispara la descarga sin errores en la consola.
 - **No verificado:** el aspecto abierto en Excel real y la impresión. Faltan el PDF en este formato y la pérdida de voceo en dB.
+
+## 10. PDF de la memoria (2026-11-09)
+
+- La memoria de cálculo (pestaña «Memoria de cálculo», botón «Imprimir / Guardar PDF») tiene una casilla nueva, activa por defecto: «Incluir tablas en formato del libro (anexo B, apaisado)».
+- El **Anexo B** va en hojas carta apaisadas, con el mismo membrete y pie que la memoria (página con nombre `memoria-apaisada` en `css/styles.css`). Trae tres tablas numeradas a continuación de las anteriores: conteo de dispositivos por nivel, lazos SLC y auxiliar +24 VDC, y lazos NAC y voceo. Las cifras son las de la pestaña «Formato libro» y las del Excel. La nota final de la memoria cierra en la última hoja apaisada.
+- Verificado con un proyecto de prueba (2 paneles, 4 niveles, 6 lazos): PDF generado con Chrome sin ventana y revisado con pdf.js. Resultado: 7 páginas, 5 verticales y 2 apaisadas; tablas numeradas del 1 al 10; texto de 8 pt como mínimo; nada fuera del margen; ningún encabezado partido tras ajustar el ancho de las columnas.
+- **No verificado:** el diálogo de impresión del navegador y el aspecto en pantalla completa; la lectura visual de las páginas fue a baja resolución. Con muchos TAG distintos en un lazo las columnas se estrechan (el ancho útil apaisado es 23,9 cm).
