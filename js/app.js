@@ -486,6 +486,7 @@
     h.push('<span class="seccion-sep"></span>');
     var cd = Calc.caida(S.cx, P);
     tab('caida', 'Caída de tensión', '', P.caida.circuitos.length ? (cd.errores ? 'error' : 'ok') : 'pend');
+    tab('libro', 'Formato libro');
     tab('memoria', 'Memoria de cálculo');
     tab('laminas', 'Diagrama unifilar');
     if (Auth.esAdmin()) tab('admin', '⚙ Administración', '', '', ' admin');
@@ -529,6 +530,7 @@
     else if (t.indexOf('p:') === 0 || t.indexOf('f:') === 0) vistaEquipo(t);
     else if (t.indexOf('n:') === 0 && S.proy.niveles.indexOf(t.slice(2)) >= 0) vistaNivel(t.slice(2));
     else if (t === 'caida') vistaCaida();
+    else if (t === 'libro') vistaLibro();
     else if (t === 'memoria') vistaMemoria();
     else if (t === 'laminas') vistaLaminas();
     else if (t === 'admin') vistaAdmin();
@@ -1201,6 +1203,53 @@
       out('tot', fmt(R.totalA, 3));
       renderTabs();
     };
+  }
+
+  /* ======================= vista: Formato libro (Notifier - Memoría de Alarma.xlsx) =======================
+   * Solo lectura. Presenta lo que ya calcula Calc.caida con las tablas del libro: 3. Conteo de dispositivos,
+   * 4. SLC + AUX y 5. NAC + VOCEO. Las columnas de dispositivos son los TAG del catálogo presentes en el proyecto. */
+  function vistaLibro() {
+    var D = FormatoLibro.datos(S.cx, S.proy), h = [];
+    function celda(v, d) { return '<td class="num">' + (v === null || v === undefined ? '—' : fmt(v, d)) + '</td>'; }
+    function cant(x) { return '<td class="num">' + (x ? fmt(x, 0) : '0') + '</td>'; }
+    function encTags(tags) { return tags.map(function (t) { return '<th class="num">' + esc(t) + '</th>'; }).join(''); }
+    h.push('<div class="encabezado"><div><h2>Formato libro</h2><div class="sub">Las tablas del libro «Notifier - Memoría de Alarma» (3. Conteo, 4. SLC + AUX y 5. NAC + VOCEO) con los datos del proyecto. Solo lectura: los datos se editan en cada panel y en «Caída de tensión».</div></div>' +
+      '<div class="acciones"><button class="btn" data-act="ir" data-tab="caida">← Caída de tensión</button></div></div>');
+    h.push('<div class="ayuda"><b>Diferencias con el libro.</b> La resistencia del lazo es de ida y vuelta (2 × L), el libro usa un solo sentido; la tensión disponible debe ser mayor o igual que la mínima, y se revisa el tope de corriente del NAC. ' +
+      'El libro no calcula la pérdida de voceo en dB porque el catálogo aún no trae la potencia de los parlantes.</div>');
+
+    /* 3. Conteo por nivel */
+    var C = D.conteo;
+    h.push('<section class="card"><div class="card-h"><h3>3. Conteo de dispositivos por nivel</h3><span class="nota">Todos los dispositivos con modelo y cantidad</span></div><div class="card-b flush tabla-wrap"><table class="t"><thead><tr><th>Nivel</th>' + encTags(C.tags) + '<th class="num">Total</th></tr></thead><tbody>');
+    C.niveles.forEach(function (n) {
+      var f = C.porNivel[n] || {}, tot = 0;
+      h.push('<tr><td>' + esc(n) + '</td>' + C.tags.map(function (t) { tot += f[t] || 0; return cant(f[t]); }).join('') + '<td class="num">' + fmt(tot, 0) + '</td></tr>');
+    });
+    if (!C.niveles.length || !C.tags.length) h.push('<tr><td colspan="' + (C.tags.length + 2) + '" class="vacio">Sin dispositivos con nivel asignado.</td></tr>');
+    h.push('</tbody></table></div></section>');
+
+    /* 4. SLC + AUX */
+    var L = D.slc;
+    h.push('<section class="card"><div class="card-h"><h3>4. Lazos SLC / auxiliar +24 VDC</h3><span class="nota">Un renglón por lazo; corrientes en A</span></div><div class="card-b flush tabla-wrap"><table class="t"><thead><tr><th>Panel</th><th>Lazo</th><th>Nivel / es</th>' + encTags(L.tags) +
+      '<th class="num">SLC espera (A)</th><th class="num">SLC alarma (A)</th><th class="num">Aux. espera (A)</th><th class="num">Aux. alarma (A)</th><th class="num">Distancia (m)</th><th class="num">Calibre (AWG)</th><th class="num">R (Ω/km)</th><th class="num">R total (Ω)</th><th class="num">Caída (V)</th><th class="num">V disp. (V)</th><th>Estado</th></tr></thead><tbody>');
+    L.filas.forEach(function (f) {
+      h.push('<tr><td>' + esc(f.equipo) + '</td><td>' + esc(f.lazo) + '</td><td>' + esc(f.niveles) + '</td>' + L.tags.map(function (t) { return cant(f.tags[t]); }).join('') +
+        celda(f.esp, 4) + celda(f.alm, 4) + celda(f.auxEsp, 4) + celda(f.auxAlm, 4) + celda(f.dist, 0) + celda(f.awg, 0) + celda(f.rKm, 2) + celda(f.rLazo, 3) + celda(f.caida, 2) + celda(f.vDisp, 2) + '<td>' + (f.estado ? badge(f.estado) : '—') + '</td></tr>');
+    });
+    if (!L.filas.length) h.push('<tr><td colspan="' + (L.tags.length + 14) + '" class="vacio">Sin lazos SLC, SLC+24V o 24 VDC.</td></tr>');
+    h.push('</tbody></table></div></section>');
+
+    /* 5. NAC + VOCEO */
+    var N = D.nac;
+    h.push('<section class="card"><div class="card-h"><h3>5. Lazos NAC / voceo</h3><span class="nota">Un renglón por lazo; la corriente es la de alarma, en A</span></div><div class="card-b flush tabla-wrap"><table class="t"><thead><tr><th>Fuente / panel</th><th>Lazo</th><th>Tipo</th><th>Nivel / es</th>' + encTags(N.tags) +
+      '<th class="num">Corriente alarma (A)</th><th class="num">Distancia (m)</th><th class="num">Calibre (AWG)</th><th class="num">R (Ω/km)</th><th class="num">R total (Ω)</th><th class="num">Caída (V)</th><th class="num">V disp. (V)</th><th>Estado</th></tr></thead><tbody>');
+    N.filas.forEach(function (f) {
+      h.push('<tr><td>' + esc(f.equipo) + '</td><td>' + esc(f.lazo) + '</td><td>' + esc(etiquetaTipo(f.tipo)) + '</td><td>' + esc(f.niveles) + '</td>' + N.tags.map(function (t) { return cant(f.tags[t]); }).join('') +
+        celda(f.iA, 4) + celda(f.dist, 0) + celda(f.awg, 0) + celda(f.rKm, 2) + celda(f.rLazo, 3) + celda(f.caida, 2) + celda(f.vDisp, 2) + '<td>' + (f.estado ? badge(f.estado) : '—') + '</td></tr>');
+    });
+    if (!N.filas.length) h.push('<tr><td colspan="' + (N.tags.length + 12) + '" class="vacio">Sin lazos NAC, IDNAC o voceo.</td></tr>');
+    h.push('</tbody></table></div></section>');
+    vista.innerHTML = h.join('');
   }
 
   /* ======================= vista: Memoria de cálculo (formato Sinergia) =======================
@@ -2557,7 +2606,7 @@
   /* Enlace directo a una sección: index.html#memoria, #caida o #proyecto */
   function tabInicial() {
     var h = String(location.hash || '').slice(1);
-    return ['proyecto', 'caida', 'memoria'].indexOf(h) >= 0 ? h : undefined;
+    return ['proyecto', 'caida', 'libro', 'memoria'].indexOf(h) >= 0 ? h : undefined;
   }
 
   function cargarDatos() {

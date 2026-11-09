@@ -77,3 +77,11 @@ Son una razón para que la variante calcule en la herramienta y deje el libro so
 | `ANALISIS-PESTAÑAS.md` | Este documento |
 
 La herramienta usa Supabase y su propio acceso con PIN (`js/auth.js`, `js/config.js`). El flujo de `.github/workflows/static.yml` publica el sitio en GitHub Pages con cada push a `main`.
+
+## 8. Avance (2026-11-09)
+
+- Decisión del usuario: se usan las pestañas 3, 4 y 5. Las pestañas 1 y 2 no se usan.
+- Se agregó la pestaña **Formato libro** (`js/formato-libro.js` y `vistaLibro` en `js/app.js`), de solo lectura, con las tablas 3 (conteo por nivel), 4 (lazos SLC y auxiliar) y 5 (lazos NAC y voceo). No cambia ninguna fórmula: usa `Calc.caida` y la misma asignación de dispositivos a lazos.
+- Las columnas de dispositivos son los TAG del catálogo presentes en el proyecto, no las abreviaturas del libro (DH, DT, MM…), porque el catálogo trae varios fabricantes.
+- Verificado en el navegador, con datos simulados: las corrientes y la caída de la tabla coinciden con `Calc.caida` (SLC 17 mA, NAC 428 mA) y las cantidades por lazo y por nivel coinciden con las filas cargadas.
+- **No se hizo:** la pérdida de voceo en dB (el catálogo no trae la potencia de los parlantes), la columna de amplificador de la tabla 5, el Excel y el PDF en este formato, ni la comparación contra el proyecto completo del libro. Las decisiones de la sección 4 siguen abiertas: el cálculo es el de la herramienta.
